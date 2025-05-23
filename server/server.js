@@ -41,6 +41,22 @@ app.get("/api/movie/upcoming", async(req, res) => {
     if (data) res.json(data);
 });
 
+//Fetch movies details
+app.get("/api/movie/details", async(req, res) => {
+    const movieId = req.query.id;
+    const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.TMDB_API_KEY}`;
+    const data = await fetchFromTMDB(url, res);
+    if (data) res.json(data);
+});
+
+//Fetch tv show details
+app.get("/api/tv/details", async(req, res) => {
+    const showId = req.query.id;
+    const url = `https://api.themoviedb.org/3/tv/${showId}?api_key=${process.env.TMDB_API_KEY}`;
+    const data = await fetchFromTMDB(url, res);
+    if (data) res.json(data);
+});
+
 // Helper function: fetch data from TMDB API
 async function fetchFromTMDB(url, res) {
     try {
