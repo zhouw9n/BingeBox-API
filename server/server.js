@@ -52,7 +52,7 @@ app.get("/api/movie/details", async(req, res) => {
 //Fetch tv show details
 app.get("/api/tv/details", async(req, res) => {
     const showId = req.query.id;
-    const url = `https://api.themoviedb.org/3/tv/${showId}?api_key=${process.env.TMDB_API_KEY}`;
+    const url = `https://api.themoviedb.org/3/tv/${showId}?append_to_response=images,videos,recommendations?api_key=${process.env.TMDB_API_KEY}`;
     const data = await fetchFromTMDB(url, res);
     if (data) res.json(data);
 });
