@@ -44,7 +44,7 @@ app.get("/api/movie/upcoming", async(req, res) => {
 //Fetch movies details
 app.get("/api/movie/details", async(req, res) => {
     const movieId = req.query.id;
-    const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.TMDB_API_KEY}&append_to_response=images,videos,recommendations`;
+    const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.TMDB_API_KEY}&append_to_response=images,videos,recommendations,credits`;
     const data = await fetchFromTMDB(url, res);
     if (data) res.json(data);
 });
