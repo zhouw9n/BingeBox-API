@@ -58,7 +58,7 @@ app.get("/api/tv/details", async(req, res) => {
 });
 
 //Fetch movie credits
-app.get("/api/tv/details", async(req, res) => {
+app.get("/api/movie/credits", async(req, res) => {
     const showId = req.query.id;
     const url = `https://api.themoviedb.org/3/movie/${showId}/credits?api_key=${process.env.TMDB_API_KEY}`;
     const data = await fetchFromTMDB(url, res);
@@ -66,7 +66,7 @@ app.get("/api/tv/details", async(req, res) => {
 });
 
 //Fetch tv show credits
-app.get("/api/tv/details", async(req, res) => {
+app.get("/api/tv/credits", async(req, res) => {
     const showId = req.query.id;
     const url = `https://api.themoviedb.org/3/tv/${showId}/credits?api_key=${process.env.TMDB_API_KEY}`;
     const data = await fetchFromTMDB(url, res);
