@@ -60,7 +60,7 @@ app.get("/api/tv/details", async(req, res) => {
 // Fetch movie by genre
 app.get("/api/movie/genre", async(req, res) => {
     const genreId = req.query.id;
-    const url = `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.TMDB_API_KEY}&include_adult=true&with_genres=28`;
+    const url = `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.TMDB_API_KEY}&include_adult=true&with_genres=${genreId}`;
     const data = await fetchFromTMDB(url, res);
     if (data) res.json(data);
 });
@@ -68,7 +68,7 @@ app.get("/api/movie/genre", async(req, res) => {
 // Fetch movie by genre
 app.get("/api/tv/genre", async(req, res) => {
     const genreId = req.query.id;
-    const url = `https://api.themoviedb.org/3/discover/tv?api_key=${process.env.TMDB_API_KEY}&include_adult=true&with_genres=28`;
+    const url = `https://api.themoviedb.org/3/discover/tv?api_key=${process.env.TMDB_API_KEY}&include_adult=true&with_genres=${genreId}`;
     const data = await fetchFromTMDB(url, res);
     if (data) res.json(data);
 });
