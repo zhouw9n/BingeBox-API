@@ -8,40 +8,40 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-//Allow request from frontend client
+// Allow request from frontend client
 app.use(cors()); 
 
 
 
-//Fetch all trending movies and shows from this week
+// Fetch all trending movies and shows from this week
 app.get("/api/trending/all", async(req, res) => {
     const url = `https://api.themoviedb.org/3/trending/all/week?api_key=${process.env.TMDB_API_KEY}`;
     const data = await fetchFromTMDB(url, res);
     if (data) res.json(data);
 });
 
-//Fetch all trending movies from this week
+// Fetch all trending movies from this week
 app.get("/api/trending/movies", async(req, res) => {
     const url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${process.env.TMDB_API_KEY}`;
     const data = await fetchFromTMDB(url, res);
     if (data) res.json(data);
 });
 
-//Fetch all trending tv shows from this week
+// Fetch all trending tv shows from this week
 app.get("/api/trending/shows", async(req, res) => {
     const url = `https://api.themoviedb.org/3/trending/tv/week?api_key=${process.env.TMDB_API_KEY}`;
     const data = await fetchFromTMDB(url, res);
     if (data) res.json(data);
 });
      
-//Fetch all upcoming movies
+// Fetch all upcoming movies
 app.get("/api/movie/upcoming", async(req, res) => {
     const url = `https://api.themoviedb.org/3/movie/upcoming?api_key=${process.env.TMDB_API_KEY}`;
     const data = await fetchFromTMDB(url, res);
     if (data) res.json(data);
 });
 
-//Fetch movies details
+// Fetch movies details
 app.get("/api/movie/details", async(req, res) => {
     const movieId = req.query.id;
     const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.TMDB_API_KEY}&append_to_response=images,videos,recommendations,credits`;
@@ -49,10 +49,26 @@ app.get("/api/movie/details", async(req, res) => {
     if (data) res.json(data);
 });
 
-//Fetch tv show details
+// Fetch tv show details
 app.get("/api/tv/details", async(req, res) => {
     const showId = req.query.id;
     const url = `https://api.themoviedb.org/3/tv/${showId}?api_key=${process.env.TMDB_API_KEY}&append_to_response=images,videos,recommendations,credits`;
+    const data = await fetchFromTMDB(url, res);
+    if (data) res.json(data);
+});
+
+// Fetch movie by genre
+app.get("/api/movie/genre", async(req, res) => {
+    const genreId = req.query.id;
+    const url = `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.TMDB_API_KEY}&include_adult=true&with_genres=28`;
+    const data = await fetchFromTMDB(url, res);
+    if (data) res.json(data);
+});
+
+// Fetch movie by genre
+app.get("/api/tv/genre", async(req, res) => {
+    const genreId = req.query.id;
+    const url = `https://api.themoviedb.org/3/discover/tv?api_key=${process.env.TMDB_API_KEY}&include_adult=true&with_genres=28`;
     const data = await fetchFromTMDB(url, res);
     if (data) res.json(data);
 });
