@@ -73,6 +73,14 @@ app.get("/api/tv/genre", async(req, res) => {
     if (data) res.json(data);
 });
 
+// Fetch search resutls
+app.get("/api/search", async(req, res) => {
+    const query = req.query;
+    const url = `https://api.themoviedb.org/3/search/multi?api_key=${process.env.TMDB_API_KEY}&query=${query}`;
+    const data = await fetchFromTMDB(url, res);
+    if (data) res.json(data);
+});
+
 // Helper function: fetch data from TMDB API
 async function fetchFromTMDB(url, res) {
     try {
