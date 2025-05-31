@@ -173,12 +173,12 @@ const collection = database.collection("movie")
 app.post("/api/datastrax/db/movie", async (req, res) => {
     const averageVector = req.body.vector;
 
-    if (!vector || !Array.isArray(vector) || vector.length === 0) {
+    if (!vector || !Array.isArray(averageVector) || averageVector.length === 0) {
         return res.status(400).json({error: "Provide a vector sample."});
     }
 
     try {
-        const response = await collection.find(
+        const cursor = collection.find(
             {},
             {
                vector: averageVector,
@@ -186,7 +186,7 @@ app.post("/api/datastrax/db/movie", async (req, res) => {
                projection: { $vector: 0 },
             }
         );
-
+        const response = await cursor.toArray();
         res.json(response);
     } catch (error) {
         res.status(500).json({error: error.message});
