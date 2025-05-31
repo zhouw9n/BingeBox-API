@@ -1,47 +1,48 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { Cohere, CohereClient } from "cohere-ai";
 
-// Load .env configs
+// Load .env configs.
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Allow request from frontend client
-app.use(cors()); 
+// Allow request from frontend client.
+app.use(cors());
+// Allow to parse json bodies for POST requests.
+app.use(express.json()); 
 
-
-
-// Fetch all trending movies and shows from this week
+// Fetch all trending movies and shows from this week.
 app.get("/api/trending/all", async(req, res) => {
     const url = `https://api.themoviedb.org/3/trending/all/week?api_key=${process.env.TMDB_API_KEY}`;
     const data = await fetchFromTMDB(url, res);
     if (data) res.json(data);
 });
 
-// Fetch all trending movies from this week
+// Fetch all trending movies from this week.
 app.get("/api/trending/movies", async(req, res) => {
     const url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${process.env.TMDB_API_KEY}`;
     const data = await fetchFromTMDB(url, res);
     if (data) res.json(data);
 });
 
-// Fetch all trending tv shows from this week
+// Fetch all trending tv shows from this week.
 app.get("/api/trending/shows", async(req, res) => {
     const url = `https://api.themoviedb.org/3/trending/tv/week?api_key=${process.env.TMDB_API_KEY}`;
     const data = await fetchFromTMDB(url, res);
     if (data) res.json(data);
 });
      
-// Fetch all upcoming movies
+// Fetch all upcoming movies.
 app.get("/api/movie/upcoming", async(req, res) => {
     const url = `https://api.themoviedb.org/3/movie/upcoming?api_key=${process.env.TMDB_API_KEY}`;
     const data = await fetchFromTMDB(url, res);
     if (data) res.json(data);
 });
 
-// Fetch movies details
+// Fetch movies details.
 app.get("/api/movie/details", async(req, res) => {
     const movieId = req.query.id;
     const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.TMDB_API_KEY}&append_to_response=images,videos,recommendations,credits`;
@@ -49,7 +50,7 @@ app.get("/api/movie/details", async(req, res) => {
     if (data) res.json(data);
 });
 
-// Fetch tv show details
+// Fetch tv show details.
 app.get("/api/tv/details", async(req, res) => {
     const showId = req.query.id;
     const url = `https://api.themoviedb.org/3/tv/${showId}?api_key=${process.env.TMDB_API_KEY}&append_to_response=images,videos,recommendations,credits`;
@@ -57,7 +58,7 @@ app.get("/api/tv/details", async(req, res) => {
     if (data) res.json(data);
 });
 
-// Fetch movie by genre
+// Fetch movie by genre.
 app.get("/api/movie/genre", async(req, res) => {
     const genreId = req.query.id;
     const url = `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.TMDB_API_KEY}&with_genres=${genreId}`;
@@ -65,7 +66,7 @@ app.get("/api/movie/genre", async(req, res) => {
     if (data) res.json(data);
 });
 
-// Fetch tv show by genre
+// Fetch tv show by genre.
 app.get("/api/tv/genre", async(req, res) => {
     const genreId = req.query.id;
     const url = `https://api.themoviedb.org/3/discover/tv?api_key=${process.env.TMDB_API_KEY}&with_genres=${genreId}`;
@@ -73,7 +74,7 @@ app.get("/api/tv/genre", async(req, res) => {
     if (data) res.json(data);
 });
 
-// Fetch search resutls
+// Fetch search resutls.
 app.get("/api/search", async(req, res) => {
     const query = req.query.query;
     const url = `https://api.themoviedb.org/3/search/multi?api_key=${process.env.TMDB_API_KEY}&query=${query}`;
@@ -81,18 +82,18 @@ app.get("/api/search", async(req, res) => {
     if (data) res.json(data);
 });
 
-// Helper function: fetch data from TMDB API
+// Helper function: fetch data from TMDB API.
 async function fetchFromTMDB(url, res) {
     try {
         const response = await fetch(url);
 
-        // This handles errors returned by external API TMDB
+        // This handles errors returned by external API TMDB.
         if (!response.ok) {
-            // Parse the response body as JSON
+            // Parse the response body as JSON.
             const errorBody = await response.json();
-            // Attempt to extract error message from JSON otherwhise fallback message
+            // Attempt to extract error message from JSON otherwhise fallback message.
             const errorMessage = errorBody?.error?.message || `HTTP error: ${response.status}`;
-            // Sending response status and JSON object back to client
+            // Sending response status and JSON object back to client.
             return res.status(response.status).json({error: errorMessage});
         }
 
@@ -100,10 +101,53 @@ async function fetchFromTMDB(url, res) {
         return data;
 
     } catch (error) {
-        // This handles internal errors by the server on render
+        // This handles internal errors by the server on render.
         console.error("Fetch of network error:", error);
         return res.status(500).json({error: "Server error. Please try again later."});
     }
 }
+
+
+/**
+ * Cohere AI API
+ */
+const cohere = new CohereClient({
+    apiKey: process.env.COHERE_AI_API_KEY,
+});
+
+app.post("/api/embed", async (req, res) => {
+    const texts = req.body.texts;
+
+    if (!texts || !Array.isArray(texts) || texts.length === 0) {
+        return res.status(400).json({error: "Provide an array of texts in the request body."});
+    }
+
+    try {
+        const response = await cohere.v2.embed({
+            model: "embed-english-v3.0",
+            inputType: "text",
+            texts,
+            embeddingTypes: ["float"],
+        });
+        const embeddings = response.body.embeddings;
+
+        const vectorLength = embeddings[0].length;
+        const averageEmbedding = Array(vectorLength).fill(0);
+
+        for (let i = 0; i < embeddings.length; i++) {
+            for (let j = 0; j < vectorLength; j++) {
+                averageEmbedding[j] += embeddings[i][j];
+            }
+        }
+
+        for (let j = 0; j < vectorLength; j++) {
+            averageEmbedding[j] /= embeddings.length;
+        }
+
+        res.json({averageEmbedding});
+    } catch (error) {
+        res.status(500).json({error: "Failed to get embeddings from Cohere."});
+    }
+});
 
 app.listen(PORT);
