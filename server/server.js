@@ -118,7 +118,7 @@ const cohere = new CohereClient({
 app.post("/api/embed", async (req, res) => {
     const texts = req.body.texts;
 
-    if (!texts || !Array.isArray(texts) || texts.length === 0) {
+    if (!texts || texts.length === 0) {
         return res.status(400).json({error: "Provide an array of texts in the request body."});
     }
 
