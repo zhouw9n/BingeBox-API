@@ -134,7 +134,7 @@ app.post("/api/embed", async (req, res) => {
             }
         );
 
-        const embeddings = response.body.embeddings;
+        const embeddings = response.embeddings;
 
         const vectorLength = embeddings[0].length;
         const averageEmbedding = Array(vectorLength).fill(0);
