@@ -131,7 +131,8 @@ app.post("/api/embed", async (req, res) => {
                 inputType: "search_query",
                 embeddingTypes: [
                     "float"
-                ]
+                ],
+                outputDimension: 1024
             }
         );
 
