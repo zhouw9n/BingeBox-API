@@ -112,7 +112,7 @@ async function fetchFromTMDB(url, res) {
  * Cohere AI API
  */
 const cohere = new CohereClient({
-    apiKey: process.env.COHERE_AI_API_KEY,
+    token: process.env.COHERE_AI_API_KEY
 });
 
 app.post("/api/embed", async (req, res) => {
@@ -123,12 +123,17 @@ app.post("/api/embed", async (req, res) => {
     }
 
     try {
-        const response = await cohere.v2.embed({
-            model: "embed-english-v3.0",
-            inputType: "text",
-            texts: texts,
-            embeddingTypes: ["float"],
-        });
+        const response = await cohere.v2.embed(
+            {
+                texts: texts,
+                model: "embed-v4.0",
+                inputType: "search_query",
+                embeddingTypes: [
+                    "float"
+                ]
+            }
+        );
+        
         const embeddings = response.body.embeddings;
 
         const vectorLength = embeddings[0].length;
