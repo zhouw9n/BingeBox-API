@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { CohereClient } from "cohere-ai";
+import { DataAPIClient } from "@datastax/astra-db-ts";
 
 // Load .env configs.
 dotenv.config();
@@ -112,14 +113,14 @@ async function fetchFromTMDB(url, res) {
  * Cohere AI API
  */
 const cohere = new CohereClient({
-    token: `${process.env.COHERE_AI_API_KEY}`
+    token: process.env.COHERE_AI_API_KEY,
 });
 
 app.post("/api/embed", async (req, res) => {
     const texts = req.body.texts;
 
     if (!texts || !Array.isArray(texts) || texts.length === 0) {
-        return res.status(400).json({error: "Provide an array of texts in the request body."});
+        return res.status(400).json({error: "Provide an array of texts."});
     }
 
     try {
@@ -136,22 +137,58 @@ app.post("/api/embed", async (req, res) => {
 
         const embeddings = response.embeddings.float;
 
-        const vectorLength = embeddings[0].length;
-        const averageEmbedding = Array(vectorLength).fill(0);
-
-        for (let i = 0; i < embeddings.length; i++) {
-            for (let j = 0; j < vectorLength; j++) {
-                averageEmbedding[j] += embeddings[i][j];
+        if (embeddings.length > 1) {
+            const vectorLength = embeddings[0].length;
+            const averageEmbedding = Array(vectorLength).fill(0);
+            for (let i = 0; i < embeddings.length; i++) {
+                for (let j = 0; j < vectorLength; j++) {
+                    averageEmbedding[j] += embeddings[i][j];
+                }
             }
-        }
 
-        for (let j = 0; j < vectorLength; j++) {
-            averageEmbedding[j] /= embeddings.length;
+            for (let j = 0; j < vectorLength; j++) {
+                averageEmbedding[j] /= embeddings.length;
+            }
+            res.json(averageEmbedding);
+        } else {
+            // Returns first embedding in array if array length is 1.
+            res.json(embeddings[0]);
         }
-
-        res.json(averageEmbedding);
     } catch (error) {
-        res.status(500).json({error: error.message || "Failed to get embeddings from Cohere."});
+        res.status(500).json({error: error.message});
+    }
+});
+
+/**
+ * Datastrax Database API
+ */
+const client = new DataAPIClient();
+
+const database = client.db(process.env.DATASTRAX_API_ENDPOINT, {
+    token: process.env.DATASTRAX_APPLICATION_TOKEN,
+});
+const collection = database.collection("movie")
+
+app.post("/api/datastrax/db/movie", async (req, res) => {
+    const averageVector = req.body.vector;
+
+    if (!vector || !Array.isArray(vector) || vector.length === 0) {
+        return res.status(400).json({error: "Provide a vector sample."});
+    }
+
+    try {
+        const response = await collection.find(
+            {},
+            {
+               vector: averageVector,
+               limit: 20,
+               projection: { $vector: 0 },
+            }
+        );
+
+        res.json(response);
+    } catch (error) {
+        res.status(500).json({error: error.message});
     }
 });
 
