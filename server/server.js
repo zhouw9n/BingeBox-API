@@ -173,7 +173,7 @@ const collection = database.collection("movie")
 app.post("/api/datastrax/db/movie", async (req, res) => {
     const averageVector = req.body.vector;
 
-    if (!vector || !Array.isArray(averageVector) || averageVector.length === 0) {
+    if (!averageVector || !Array.isArray(averageVector) || averageVector.length === 0) {
         return res.status(400).json({error: "Provide a vector sample."});
     }
 
