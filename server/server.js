@@ -149,7 +149,7 @@ app.post("/api/embed", async (req, res) => {
             averageEmbedding[j] /= embeddings.length;
         }
 
-        res.json({averageEmbedding});
+        res.json(averageEmbedding);
     } catch (error) {
         res.status(500).json({error: error.message || "Failed to get embeddings from Cohere."});
     }
