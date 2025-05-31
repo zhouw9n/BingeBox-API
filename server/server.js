@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { Cohere, CohereClient } from "cohere-ai";
+import { CohereClient } from "cohere-ai";
 
 // Load .env configs.
 dotenv.config();
@@ -112,7 +112,7 @@ async function fetchFromTMDB(url, res) {
  * Cohere AI API
  */
 const cohere = new CohereClient({
-    token: process.env.COHERE_AI_API_KEY
+    token: `${process.env.COHERE_AI_API_KEY}`
 });
 
 app.post("/api/embed", async (req, res) => {
@@ -133,7 +133,7 @@ app.post("/api/embed", async (req, res) => {
                 ]
             }
         );
-        
+
         const embeddings = response.body.embeddings;
 
         const vectorLength = embeddings[0].length;
@@ -151,7 +151,7 @@ app.post("/api/embed", async (req, res) => {
 
         res.json({averageEmbedding});
     } catch (error) {
-        res.status(500).json({error: "Failed to get embeddings from Cohere."});
+        res.status(500).json({error: error.message || "Failed to get embeddings from Cohere."});
     }
 });
 
