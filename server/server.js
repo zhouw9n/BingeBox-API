@@ -151,7 +151,7 @@ app.post("/api/datastrax/db/add", async (req, res) => {
     }
     
     try {
-        const result = await collection.insertOne(
+        const result = await favorites.insertOne(
             {
                 _id: favorite.datastax_id,
                 id: favorite.id,
@@ -174,7 +174,7 @@ app.delete("/api/datastrax/db/remove", async (req, res) => {
     }
     
     try {
-        const result = await collection.deleteOne(
+        const result = await favorites.deleteOne(
             {
                 _id: datastrax_id,
             }
