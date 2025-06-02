@@ -117,7 +117,7 @@ const client = new DataAPIClient();
 const database = client.db(process.env.DATASTRAX_API_ENDPOINT, {
     token: process.env.DATASTRAX_APPLICATION_TOKEN,
 });
-const collection = database.collection("collection");
+const collection = database.collection("library");
 
 app.post("/api/datastrax", async (req, res) => {
     const query = req.body.expression;
@@ -129,7 +129,7 @@ app.post("/api/datastrax", async (req, res) => {
     try {
         const cursor = await collection.find(
             {
-                $vectorize: query,
+                vectorize: query,
             },
             {
                 
