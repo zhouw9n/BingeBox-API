@@ -128,16 +128,13 @@ app.post("/api/datastrax/library", async (req, res) => {
 
     try {
         const cursor = await collection.find(
+            {},
             {
                 vectorize: query,
-            },
-            {
-                
-                limit: 50,
+                limit: 10,
                 projection: {
                     _id: 0,
                 },
-                includeSimilarity: true,
             }   
         );
 
