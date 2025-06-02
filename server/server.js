@@ -131,7 +131,7 @@ app.post("/api/datastrax", async (req, res) => {
             {},
             {
                 sort: { $vectorize: query },
-                limit: 10,
+                limit: 50,
                 includeSimilarity: true,
                 projection: { _id: 0 },
             }   
