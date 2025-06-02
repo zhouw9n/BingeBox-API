@@ -136,7 +136,7 @@ app.post("/api/datastrax/library", async (req, res) => {
             }   
         );
         const data = await response.json();
-        return res.json(data);
+        res.json(data);
     } catch (error) {
         res.status(500).json({error: error.message});
     }
