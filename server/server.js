@@ -133,6 +133,7 @@ app.post("/api/datastrax/library", async (req, res) => {
                 vectorize: query,
                 limit: 50,
                 projection: { $vector: 0},
+                includeSimilarity: true,
             }   
         );
 
