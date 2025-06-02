@@ -117,74 +117,26 @@ const client = new DataAPIClient();
 const database = client.db(process.env.DATASTRAX_API_ENDPOINT, {
     token: process.env.DATASTRAX_APPLICATION_TOKEN,
 });
-const collection = database.collection("movie");
-const favorites = database.collection("favorites");
+const collection = database.collection("library");
 
-app.post("/api/datastrax/db/movie", async (req, res) => {
-    const averageVector = req.body.vector;
+app.post("/api/datastrax/library", async (req, res) => {
+    const query = req.body.expression;
 
-    if (!averageVector || !Array.isArray(averageVector) || averageVector.length === 0) {
-        return res.status(400).json({error: "Provide a vector sample."});
+    if (!query || typeof query !== "string") {
+        return res.status(400).json({error: "Query provided is not a string."});
     }
 
     try {
-        const cursor = collection.find(
+        const response = await collection.find(
             {},
             {
-               vector: averageVector,
-               limit: 20,
-               projection: { $vector: 0 },
-            }
+                vectorize: query,
+                limit: 50,
+                projection: { $vector: 0},
+            }   
         );
-        const response = await cursor.toArray();
-        res.json(response);
-    } catch (error) {
-        res.status(500).json({error: error.message});
-    }
-});
-
-app.post("/api/datastrax/db/add", async (req, res) => {
-    const favorite = req.body;
-
-    if (!favorite) {
-        return res.status(400).json({error: "No body of object provided."});
-    }
-    
-    try {
-        const result = await favorites.insertOne(
-            {
-                _id: favorite.datastax_id,
-                id: favorite.id,
-                title: favorite.title,
-                description: favorite.description,
-            }
-        );
-
-        res.status(200).json({success: true, id: favorite.datastax_id});
-    } catch (error) {
-        res.status(500).json({error: error.message});
-    }
-});
-
-app.delete("/api/datastrax/db/remove", async (req, res) => {
-    const datastrax_id = req.body.id;
-
-    if (!datastrax_id) {
-        return res.status(400).json({error: "No id provided."});
-    }
-    
-    try {
-        const result = await favorites.deleteOne(
-            {
-                _id: datastrax_id,
-            }
-        );
-
-        if (result.deletedCount === 0) {
-            return res.status(404).json({error: "Item not found"});
-        }
-
-        res.status(200).json({success: true, message: `${datastrax_id} has been removed.`});
+        const data = await response.json();
+        return res.json(data);
     } catch (error) {
         res.status(500).json({error: error.message});
     }
