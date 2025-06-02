@@ -117,9 +117,9 @@ const client = new DataAPIClient();
 const database = client.db(process.env.DATASTRAX_API_ENDPOINT, {
     token: process.env.DATASTRAX_APPLICATION_TOKEN,
 });
-const collection = database.collection("library");
+const collection = database.collection("collection");
 
-app.post("/api/datastrax/library", async (req, res) => {
+app.post("/api/datastrax", async (req, res) => {
     const query = req.body.expression;
 
     if (!query || typeof query !== "string") {
