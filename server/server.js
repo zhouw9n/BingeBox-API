@@ -127,7 +127,7 @@ app.post("/api/datastrax/library", async (req, res) => {
     }
 
     try {
-        const response = await collection.find(
+        const data = await collection.find(
             {},
             {
                 vectorize: query,
@@ -135,8 +135,8 @@ app.post("/api/datastrax/library", async (req, res) => {
                 projection: { $vector: 0},
             }   
         );
-        const data = await response.json();
-        res.json(data);
+        
+        res.json(data)
     } catch (error) {
         res.status(500).json({error: error.message});
     }
