@@ -129,7 +129,7 @@ app.post("/api/datastrax/library", async (req, res) => {
     try {
         const cursor = await collection.find(
             {
-                $vectorize: query,
+                vectorize: query,
             },
             {
                 
